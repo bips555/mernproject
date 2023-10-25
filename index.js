@@ -1,5 +1,7 @@
 const http = require("http");
-const server = http.createServer();
+const app = require("./src/config/express.config")
+// mounted express to node server
+const server = http.createServer(app);
 
 server.listen('3008','localhost',(err)=>
 {
