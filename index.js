@@ -3,6 +3,8 @@ const app = require("./src/config/express.config")
 // mounted express to node server
 const server = http.createServer(app);
 
+// entrypoint
+
 server.listen('3008','localhost',(err)=>
 {
     if(!err)
