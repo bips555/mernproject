@@ -13,7 +13,7 @@ filename:(req,file,cb)=>
     let random=Math.round(Math.random()*9999)
     let ext=(file.originalname.split(".")).pop()
     let filename=Date.now()+"-"+random+"."+ext
-    console.log(filename);
+    
     cb(null,filename)
 }
 });
