@@ -1,6 +1,8 @@
 const express = require("express")
 const app = express();
-const router=require('../router/')
+const router=require('../router/');
+const { MulterError } = require("multer");
+const { ZodError } = require("zod");
 // body parsers
 app.use(express.json())
 app.use(express.urlencoded({
@@ -17,18 +19,35 @@ app.use((req,res,next)=>
     })
 })
 // error handling middleware
-app.use((error,req,res,next)=>{
-    console.log('garabge collector',error);
-let code = error.code?? 500;
-let message = error.message??"internal server error"
-// TODO: Handle different types of exception
-res.status(code).json(
-{
-    result:null,
-    message:message,
-    meta:null
-})
-})
+app.use((error, req, res, next) => {
+    console.log("garbage collector: ", error);
+    let code = error.code ?? 500;
+    let message = error.message ?? "internal server error";
+    let result = error.result ?? null;
+    if (error instanceof MulterError) {
+      if (error.code === "LIMIT_FILE_SIZE")
+        (code = 400), (message = error.message);
+    }
+  
+    //  todo: handle different type of exception
+  
+    if (error instanceof ZodError) {
+      code = 400;
+      let zodErrors = error.errors;
+      let msg = {};
+      zodErrors.map((err) => {
+        msg[err.path[0]] = err.message;
+      });
+      message = "validation failure";
+      result = msg;
+    }
+    res.status(code).json({
+      result: result,
+      message: message,
+      meta: null,
+    });
+  });
+
 
 // before exporting we use error handler
 
